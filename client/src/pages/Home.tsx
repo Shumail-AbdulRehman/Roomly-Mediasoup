@@ -236,9 +236,6 @@ function Home() {
             }`}
             style={{ boxShadow: "inset 0 0 60px -20px rgba(0, 255, 95, 0.12)" }}
           />
-          <div className="absolute top-3 left-3 px-2 py-1 rounded bg-canvas/80 border border-border text-[10px] font-mono text-muted uppercase tracking-wide">
-            Camera preview
-          </div>
           <video
             ref={localVideoRef}
             autoPlay
