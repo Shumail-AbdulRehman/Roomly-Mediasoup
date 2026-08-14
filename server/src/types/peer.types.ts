@@ -10,7 +10,6 @@ export interface Peer {
   consumers: Map<string, Consumer>;
 }
 
-
 type TransportData = {
   transport: Transport;
   type: "send" | "recv";
