@@ -1,2 +1,46 @@
-@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap");
 @import "tailwindcss";
+
+@theme {
+  --color-canvas: #0B0C0F;
+  --color-surface: #14161B;
+  --color-surface-highlight: #1E2028;
+  --color-border: #2A2D36;
+  --color-ink: #E9EBEF;
+  --color-muted: #8B919C;
+  --color-tally-red: #FF2525;
+  --color-waveform-green: #00FF5F;
+  --color-vu-amber: #FFB800;
+  --color-peak-red: #FF4D4D;
+
+  --font-display: "Chakra Petch", sans-serif;
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@keyframes live-ring {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.live-ring {
+  position: relative;
+}
+
+.live-ring::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(from 0deg, transparent 0%, rgba(0, 255, 95, 0.7) 25%, transparent 50%);
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: live-ring 3s linear infinite;
+  pointer-events: none;
+}
+
+.live-ring-muted::before {
+  animation-play-state: paused;
+  opacity: 0.35;
+}
