@@ -279,13 +279,13 @@ function Conference() {
         {roomId && (
           <button
             onClick={copyRoomId}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.08] transition-all duration-200 group"
+            className="flex items-center gap-2 pl-3.5 pr-2.5 py-1.5 rounded-full bg-[#141416] hover:bg-[#1a1a1d] border border-white/[0.08] transition-all duration-200 active:scale-95"
           >
-            <span className="text-stone-400 text-xs ">
+            <span className="font-mono text-stone-300 text-xs tracking-normal">
               {roomId.slice(0, 8)}...{roomId.slice(-4)}
             </span>
-            <span className="text-[10px] text-stone-500 group-hover:text-amber-400 transition-colors font-medium uppercase tracking-wider">
-              {copied ? "Copied" : "Copy"}
+            <span className="text-[10px] text-stone-500 hover:text-stone-300 transition-colors">
+              {copied ? "copied" : "copy"}
             </span>
           </button>
         )}
@@ -472,10 +472,10 @@ function Conference() {
 
         {/* Empty State */}
         {videoAudioStreams.length === 0 && !isScreenShareActive && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-5 pointer-events-none">
-            <div className="w-24 h-24 rounded-full bg-white/[0.03] border border-white/[0.08] flex items-center justify-center">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 pointer-events-none">
+            <div className="w-16 h-16 rounded-full bg-[#141416] border border-white/[0.06] flex items-center justify-center">
               <svg
-                className="w-9 h-9 text-stone-600"
+                className="w-6 h-6 text-stone-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -488,20 +488,33 @@ function Conference() {
                 />
               </svg>
             </div>
-            <div className="text-center space-y-2">
-              <p className="text-stone-300 text-base font-medium">
+            <div className="text-center space-y-1">
+              <p className="text-stone-400 text-sm font-normal">
                 Waiting for others
               </p>
-              <p className="text-stone-500 text-sm">
+              <p className="text-stone-600 text-xs">
                 Share the room ID to invite someone
               </p>
             </div>
             {roomId && (
               <button
                 onClick={copyRoomId}
-                className="pointer-events-auto mt-2 px-5 py-2.5 rounded-lg bg-amber-500/10 hover:bg-amber-500/15 border border-amber-500/20 text-amber-400 text-sm font-medium transition-colors"
+                className="pointer-events-auto mt-1 flex items-center gap-2 px-4 py-2 rounded-full bg-transparent hover:bg-white/[0.04] border border-white/[0.08] text-stone-400 text-xs font-normal transition-colors active:scale-95"
               >
-                {copied ? "Copied to clipboard" : "Copy room ID"}
+                <svg
+                  className="w-3.5 h-3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                  />
+                </svg>
+                <span>{copied ? "Copied" : "Copy room ID"}</span>
               </button>
             )}
           </div>
