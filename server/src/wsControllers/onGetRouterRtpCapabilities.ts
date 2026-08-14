@@ -3,23 +3,25 @@ import { Peer } from "../types/peer.types.js";
 import send from "../utils/send.js";
 import { getRoom } from "../lib/room.js";
 
-function onGetRouterRtpCapabilities(msg:Msg, peer:Peer) {
+function onGetRouterRtpCapabilities(msg: Msg, peer: Peer) {
+  if (!peer.roomId) {
+    console.log("peer room id misisng in onGetRouterRtpCapabilities ");
+    return;
+  }
+  const room = getRoom(peer.roomId);
 
-    const room= getRoom(msg.data);
-
-    if (!room) {
+  if (!room) {
     send(peer.ws, {
       type: "error",
       data: {},
       error: "room not found",
     });
     return;
-    }
+  }
 
+  const routerRtpCapabilities = room.router.rtpCapabilities;
 
-    const routerRtpCapabilities =room.router.rtpCapabilities;
-
-    if (!routerRtpCapabilities) {
+  if (!routerRtpCapabilities) {
     send(peer.ws, {
       type: "error",
       data: {},
@@ -28,13 +30,12 @@ function onGetRouterRtpCapabilities(msg:Msg, peer:Peer) {
     return;
   }
 
+  console.log("check rtp ");
   send(peer.ws, {
     type: "routerCapabilities",
-    data: routerRtpCapabilities,
+    data: { routerRtpCapabilities, roomId: peer.roomId },
   });
   return;
-
 }
-
 
 export default onGetRouterRtpCapabilities;
