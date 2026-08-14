@@ -1,0 +1,13 @@
+# Local environment files
+.env
+client/.env
+server/.env
+
+# Project context / notes
+PROJECT_CONTEXT.md
+
+# Agent/editor metadata
+.agents/
+.claude/
+.windsurf/
+skills-lock.json
