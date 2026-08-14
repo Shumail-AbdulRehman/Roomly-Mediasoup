@@ -71,8 +71,6 @@ This is the exact order of messages when a user joins a room:
 10. Server sends `newProducer` for every producer already in the room.
 11. Client sends `createConsumer` for each one, the server replies with `consumerCreated`, and the client resumes the consumer.
 
-![Signaling flow diagram](signaling-diagram.jpg)
-
 Screen sharing follows the same `produce` / `newProducer` / `createConsumer` pattern, but the producer is tagged with `appData: { type: "screen" }` so the UI can show it as a separate tile.
 
 ### Media flow
