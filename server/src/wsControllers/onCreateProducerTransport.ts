@@ -5,15 +5,12 @@ import { createWebrtcTransport } from "../lib/createWebRtcTransport.js";
 import send from "../utils/send.js";
 import { getRoom } from "../lib/room.js";
 
-async function onCreateProducerTransport(msg:Msg, peer:Peer) {
+async function onCreateProducerTransport(peer: Peer) {
+  const roomId = peer?.roomId;
 
-    // const roomId=msg.data.roomId;
+  console.log("check run");
 
-    const roomId=peer?.roomId;
-
-
-
-    if (!roomId) {
+  if (!roomId) {
     send(peer.ws, {
       type: "error",
       data: {},
@@ -22,9 +19,9 @@ async function onCreateProducerTransport(msg:Msg, peer:Peer) {
     return;
   }
 
-  const room= getRoom(roomId);
+  const room = getRoom(roomId);
 
-   if (!room) {
+  if (!room) {
     send(peer.ws, {
       type: "error",
       data: {},
@@ -34,22 +31,17 @@ async function onCreateProducerTransport(msg:Msg, peer:Peer) {
     return;
   }
 
-
-  const {transport, params} = await createWebrtcTransport(room.router);
-  peer.transports.set(transport.id,{
+  const { transport, params } = await createWebrtcTransport(room.router);
+  peer.transports.set(transport.id, {
     transport,
-    type:"send"
+    type: "send",
   });
 
-  
-
-   send(peer.ws, {
+  send(peer.ws, {
     type: "producerTransportCreated",
     data: params,
   });
-return;
-
+  return;
 }
-
 
 export default onCreateProducerTransport;
