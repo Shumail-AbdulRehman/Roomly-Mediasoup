@@ -1,7 +1,11 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import {
+  createBrowserRouter,
+  Navigate,
+  RouterProvider,
+} from "react-router-dom";
 import Home from "./pages/Home.tsx";
 import Conference from "./pages/Conference.tsx";
 import { Provider } from "react-redux";
@@ -12,6 +16,10 @@ const router = createBrowserRouter([
     path: "/",
     element: <App />,
     children: [
+      {
+        index: true,
+        element: <Navigate to="/home" replace />,
+      },
       {
         path: "home",
         element: <Home />,
