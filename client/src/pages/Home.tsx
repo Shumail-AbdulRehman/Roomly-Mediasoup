@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import send from "../utils/send";
 import { connectWebSocket } from "../lib/websocket";
 import { useNavigate } from "react-router-dom";
@@ -19,11 +19,22 @@ function Home() {
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [videoEnabled, setVideoEnabled] = useState(false);
 
-  const localVideoRef = useRef<HTMLVideoElement>(null);
+  const localVideoRef = useRef<HTMLVideoElement | null>(null);
   const isJoiningRef = useRef(false);
   const mountedRef = useRef(true);
   const audioEnabledRef = useRef(audioEnabled);
   const videoEnabledRef = useRef(videoEnabled);
+
+  const setLocalVideoNode = useCallback(
+    (node: HTMLVideoElement | null) => {
+      if (!node) return;
+      localVideoRef.current = node;
+      if (localStream) {
+        node.srcObject = localStream;
+      }
+    },
+    [localStream],
+  );
 
   useEffect(() => {
     audioEnabledRef.current = audioEnabled;
@@ -176,13 +187,31 @@ function Home() {
       {/* Left pane */}
       <div className="relative w-full lg:w-[45%] flex flex-col p-8 lg:p-12">
         {/* Header */}
-        <div className="mb-12">
+        <div className="mb-6 lg:mb-12">
           <h1 className="font-display text-2xl font-semibold tracking-tight text-ink">
             Roomly
           </h1>
           <p className="text-sm text-muted mt-1">
             Multi-party video calls, simplified
           </p>
+        </div>
+
+        {/* Mobile camera preview */}
+        <div className="lg:hidden w-full mb-6">
+          <div className="relative w-full max-w-sm mx-auto aspect-video rounded-2xl overflow-hidden bg-surface border border-border">
+            <video
+              ref={setLocalVideoNode}
+              autoPlay
+              playsInline
+              muted
+              className={`w-full h-full object-cover ${videoEnabled ? "scale-x-[-1]" : "hidden"}`}
+            />
+            {!videoEnabled && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-muted text-sm">Camera off</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Form */}
@@ -330,7 +359,7 @@ function Home() {
       <div className="hidden lg:flex w-full lg:w-[55%] items-center justify-center p-12 border-l border-border bg-canvas">
         <div className="relative w-full max-w-3xl aspect-video rounded-2xl overflow-hidden bg-surface border border-border">
           <video
-            ref={localVideoRef}
+            ref={setLocalVideoNode}
             autoPlay
             playsInline
             muted

@@ -258,8 +258,6 @@ function Conference() {
       stream: new MediaStream([p.screenConsumer!.track]),
     }));
 
-  const participantCount = videoAudioStreams.length + 1;
-
   const gridClass =
     videoAudioStreams.length <= 1
       ? "grid-cols-1"
@@ -275,14 +273,15 @@ function Conference() {
     <div className="h-screen bg-canvas text-ink font-sans relative overflow-hidden">
       {/* Top pill */}
       {roomId && (
-        <div className="absolute top-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-4 px-4 py-2 rounded-full bg-surface/90 border border-border backdrop-blur-md">
+        <div className="absolute top-4 sm:top-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 rounded-full bg-surface/90 border border-border backdrop-blur-md max-w-[92vw]">
+          <div className="overflow-x-auto max-w-[60vw] sm:max-w-none">
+            <span className="text-[11px] sm:text-xs text-ink whitespace-nowrap">{roomId}</span>
+          </div>
           <button
             onClick={copyRoomId}
-            className="flex items-center gap-2 text-xs transition-opacity hover:opacity-80 active:scale-95"
+            aria-label="Copy room ID"
+            className="flex items-center justify-center transition-opacity hover:opacity-80 active:scale-95"
           >
-            <span className="font-mono text-ink">
-              {roomId.slice(0, 8)}...{roomId.slice(-4)}
-            </span>
             {copied ? (
               <svg className="w-3.5 h-3.5 text-waveform-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -293,22 +292,6 @@ function Conference() {
               </svg>
             )}
           </button>
-
-          <div className="h-4 w-px bg-border"></div>
-
-          <div className="flex items-center gap-1.5">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-waveform-green opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-waveform-green"></span>
-            </span>
-            <span className="font-display text-[10px] font-medium text-waveform-green uppercase tracking-wider">Live</span>
-          </div>
-
-          <div className="h-4 w-px bg-border"></div>
-
-          <span className="text-muted text-xs">
-            {participantCount} in call
-          </span>
         </div>
       )}
 
@@ -333,7 +316,7 @@ function Conference() {
         {isScreenShareActive ? (
           <div className="flex flex-col md:flex-row gap-4 h-full">
             {/* Left: screen share */}
-            <div className="flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
+            <div className="h-[55%] md:h-auto md:flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
               {screenStreams.map(({ peerId, ownerPeerId, stream }) => (
                 <div
                   key={peerId}
@@ -373,11 +356,11 @@ function Conference() {
             </div>
 
             {/* Right sidebar: participant cameras */}
-            <div className="w-full md:w-[30%] flex flex-row md:flex-col gap-3 overflow-x-auto md:overflow-y-auto md:overflow-x-hidden shrink-0 pb-1 md:pb-0 pr-0 md:pr-1">
+            <div className="h-[45%] md:h-auto md:w-[30%] grid grid-cols-2 md:flex md:flex-col gap-3 overflow-y-auto md:overflow-y-auto overflow-x-hidden shrink-0 pb-1 md:pb-0 pr-0 md:pr-1">
               {videoAudioStreams.map(({ peerId, stream, hasVideo }) => (
                 <div
                   key={peerId}
-                  className={`relative shrink-0 w-40 md:w-full aspect-video md:aspect-[4/3] rounded-xl overflow-hidden bg-surface shadow-lg shadow-black/20 ${
+                  className={`relative w-full aspect-video md:aspect-[4/3] rounded-xl overflow-hidden bg-surface shadow-lg shadow-black/20 ${
                     hasVideo ? "border border-waveform-green/20" : "border border-border"
                   }`}
                 >
@@ -462,9 +445,9 @@ function Conference() {
         )}
 
         {/* Self View */}
-        <div className="absolute bottom-24 right-5 z-10">
+        <div className="absolute top-16 right-3 z-10 sm:bottom-24 sm:right-5 sm:top-auto">
           <div className={`rounded-2xl ${isVideoEnabled ? "live-ring" : "live-ring live-ring-muted"}`}>
-            <div className="relative w-44 h-28 rounded-2xl overflow-hidden bg-surface border border-border">
+            <div className="relative w-20 h-14 sm:w-44 sm:h-28 rounded-2xl overflow-hidden bg-surface border border-border">
               <video
                 ref={localVideoRef}
                 autoPlay
@@ -486,11 +469,11 @@ function Conference() {
       </div>
 
       {/* Controls dock */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-3 py-2 rounded-2xl bg-surface/90 border border-border backdrop-blur-md">
+      <div className="fixed bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 rounded-2xl bg-surface/90 border border-border backdrop-blur-md">
         {/* Mic */}
         <button
           onClick={toggleAudio}
-          className={`h-11 px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 ${
+          className={`h-10 sm:h-11 px-3 sm:px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 ${
             isAudioEnabled
               ? "bg-surface-highlight border border-border text-ink"
               : "bg-transparent border border-border text-muted hover:bg-surface-highlight hover:text-ink"
@@ -514,7 +497,7 @@ function Conference() {
         {/* Camera */}
         <button
           onClick={toggleVideo}
-          className={`h-11 px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 ${
+          className={`h-10 sm:h-11 px-3 sm:px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 ${
             isVideoEnabled
               ? "bg-surface-highlight border border-border text-ink"
               : "bg-transparent border border-border text-muted hover:bg-surface-highlight hover:text-ink"
@@ -535,7 +518,7 @@ function Conference() {
         {/* Screen Share */}
         <button
           onClick={toggleScreenShare}
-          className={`h-11 px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 ${
+          className={`h-10 sm:h-11 px-3 sm:px-4 rounded-xl flex items-center justify-center gap-2 transition-all duration-200 active:scale-95 ${
             isScreenSharing
               ? "bg-surface-highlight border border-vu-amber/30 text-vu-amber"
               : "bg-transparent border border-border text-muted hover:bg-surface-highlight hover:text-ink"
@@ -554,7 +537,7 @@ function Conference() {
         {/* Leave */}
         <button
           onClick={leaveCall}
-          className="h-11 px-4 rounded-full bg-tally-red hover:bg-peak-red text-white text-xs font-medium transition-all duration-200 flex items-center gap-2 active:scale-95"
+          className="h-10 sm:h-11 px-3 sm:px-4 rounded-full bg-tally-red hover:bg-peak-red text-white text-xs font-medium transition-all duration-200 flex items-center gap-2 active:scale-95"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 8l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M5 3a2 2 0 00-2 2v1c0 8.284 6.716 15 15 15h1a2 2 0 002-2v-3.28a1 1 0 00-.684-.948l-4.493-1.498a1 1 0 00-1.21.502l-1.13 2.257a11.042 11.042 0 01-5.516-5.517l2.257-1.128a1 1 0 00.502-1.21L9.228 3.683A1 1 0 008.279 3H5z" />
