@@ -21,7 +21,7 @@ export function connectWebSocket(): Promise<WebSocket> {
   if (ws?.readyState === WebSocket.OPEN) return Promise.resolve(ws);
 
   return new Promise((resolve, reject) => {
-    ws = new WebSocket("ws://localhost:3016");
+    ws = new WebSocket("wss://192.168.100.235:3016");
 
     ws.onopen = () => {
       if (!ws) return;

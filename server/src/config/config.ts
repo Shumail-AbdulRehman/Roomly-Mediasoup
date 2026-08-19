@@ -44,7 +44,7 @@ export const config = {
         {
           // ip: "127.0.0.1",
           ip: "0.0.0.0",
-          announcedIp: "127.0.0.1", // localhost testing; use LAN IP for cross-device
+          announcedIp: "192.168.100.235", // LAN IP for cross-device testing
         },
       ] as TransportListenInfo[],
       maxIncomingBitrate: 1500000,

@@ -11,3 +11,9 @@ PROJECT_CONTEXT.md
 .claude/
 .windsurf/
 skills-lock.json
+
+# Local development certificates
+.mkcert/
+client/certs/
+server/certs/
+mkcert
