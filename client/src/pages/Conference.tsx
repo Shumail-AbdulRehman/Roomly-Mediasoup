@@ -317,7 +317,7 @@ function Conference() {
           <div className="flex flex-col md:flex-row gap-4 h-full">
             {/* Left: screen share */}
             <div className="h-[55%] md:h-auto md:flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
-              {screenStreams.map(({ peerId, ownerPeerId, stream }) => (
+              {screenStreams.map(({ peerId, ownerPeerId: _ownerPeerId, stream }) => (
                 <div
                   key={peerId}
                   className="relative flex-1 rounded-2xl overflow-hidden bg-surface border border-waveform-green/20 shadow-lg shadow-black/20 group"
@@ -336,11 +336,11 @@ function Conference() {
                     className="w-full h-full object-contain bg-black cursor-pointer"
                     onDoubleClick={() => enterFullscreen(peerId)}
                   />
-                  <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-vu-amber/10 border border-vu-amber/20 backdrop-blur-sm">
+                  {/* <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-vu-amber/10 border border-vu-amber/20 backdrop-blur-sm">
                     <span className="text-vu-amber text-[10px] font-medium uppercase tracking-wider">
                       Screen - Guest {shortPeerId(ownerPeerId)}
                     </span>
-                  </div>
+                  </div> */}
 
                   <button
                     onClick={() => enterFullscreen(peerId)}
