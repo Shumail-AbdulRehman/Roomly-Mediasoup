@@ -93,7 +93,7 @@ function Conference() {
     };
   }, []);
 
-  useEffect(() => {
+  useEffect(() => { 
     const handleRemoteStream = (remoteParticipant: RemoteParticipant) => {
       console.log("Remote stream received:", remoteParticipant);
       setIsReconnecting(false);
@@ -238,6 +238,7 @@ function Conference() {
 
   const videoAudioStreams = remoteParticipants.map((p) => {
     const stream = new MediaStream();
+    
 
     if (p.cameraConsumer?.track) {
       stream.addTrack(p.cameraConsumer.track);
@@ -247,7 +248,7 @@ function Conference() {
       stream.addTrack(p.audioConsumer.track);
     }
 
-    return { peerId: p.peerId, stream, hasVideo: !!p.cameraConsumer?.track };
+    return { peerId: p.peerId, stream,userName:p.userName, hasVideo: !!p.cameraConsumer?.track };
   });
 
   const screenStreams = remoteParticipants
@@ -256,6 +257,7 @@ function Conference() {
       peerId: `${p.peerId}-screen`,
       ownerPeerId: p.peerId,
       stream: new MediaStream([p.screenConsumer!.track]),
+      userName:p.userName
     }));
 
   const gridClass =
@@ -265,7 +267,6 @@ function Conference() {
         ? "grid-cols-1 md:grid-cols-2"
         : "grid-cols-2 md:grid-cols-3";
 
-  const shortPeerId = (id: string) => id.slice(0, 6).toUpperCase();
 
   const isScreenShareActive = screenStreams.length > 0;
 
@@ -317,7 +318,7 @@ function Conference() {
           <div className="flex flex-col md:flex-row gap-4 h-full">
             {/* Left: screen share */}
             <div className="h-[55%] md:h-auto md:flex-1 flex flex-col gap-4 min-h-0 overflow-hidden">
-              {screenStreams.map(({ peerId, ownerPeerId: _ownerPeerId, stream }) => (
+              {screenStreams.map(({ peerId, ownerPeerId: _ownerPeerId, stream,userName }) => (
                 <div
                   key={peerId}
                   className="relative flex-1 rounded-2xl overflow-hidden bg-surface border border-waveform-green/20 shadow-lg shadow-black/20 group"
@@ -336,11 +337,11 @@ function Conference() {
                     className="w-full h-full object-contain bg-black cursor-pointer"
                     onDoubleClick={() => enterFullscreen(peerId)}
                   />
-                  {/* <div className="absolute top-3 left-3 px-2.5 py-1 rounded-md bg-vu-amber/10 border border-vu-amber/20 backdrop-blur-sm">
-                    <span className="text-vu-amber text-[10px] font-medium uppercase tracking-wider">
-                      Screen - Guest {shortPeerId(ownerPeerId)}
+                  <div className="absolute top-3 left-3 px-2.5 py-1 ">
+                    <span className=" bg-black text-[13px] font-medium  tracking-wider">
+                       {userName}
                     </span>
-                  </div> */}
+                  </div>
 
                   <button
                     onClick={() => enterFullscreen(peerId)}
@@ -357,7 +358,7 @@ function Conference() {
 
             {/* Right sidebar: participant cameras */}
             <div className="h-[45%] md:h-auto md:w-[30%] grid grid-cols-2 md:flex md:flex-col gap-3 overflow-y-auto md:overflow-y-auto overflow-x-hidden shrink-0 pb-1 md:pb-0 pr-0 md:pr-1">
-              {videoAudioStreams.map(({ peerId, stream, hasVideo }) => (
+              {videoAudioStreams.map(({ peerId, stream, hasVideo,userName }) => (
                 <div
                   key={peerId}
                   className={`relative w-full aspect-video md:aspect-[4/3] rounded-xl overflow-hidden bg-surface shadow-lg shadow-black/20 ${
@@ -379,7 +380,7 @@ function Conference() {
                     <div className="w-full h-full flex flex-col items-center justify-center gap-2">
                       <div className="w-10 h-10 rounded-full bg-surface-highlight border border-border flex items-center justify-center">
                         <span className="text-base font-medium text-ink">
-                          {shortPeerId(peerId).slice(0, 2)}
+                          {userName}
                         </span>
                       </div>
                       <span className="text-muted text-xs">Audio only</span>
@@ -388,7 +389,7 @@ function Conference() {
 
                   <div className="absolute bottom-0 left-0 right-0 p-2 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
                     <span className="text-ink text-[11px] font-medium">
-                      Guest {shortPeerId(peerId)}
+                       {userName}
                     </span>
                   </div>
                 </div>
@@ -397,7 +398,7 @@ function Conference() {
           </div>
         ) : (
           <div className={`w-full h-full grid ${gridClass} gap-4 auto-rows-fr transition-all duration-300`}>
-            {videoAudioStreams.map(({ peerId, stream, hasVideo }) => (
+            {videoAudioStreams.map(({ peerId, stream, hasVideo,userName }) => (
               <div
                 key={peerId}
                 className={`relative rounded-2xl overflow-hidden bg-surface shadow-lg shadow-black/20 group transition-colors duration-300 ${
@@ -419,7 +420,7 @@ function Conference() {
                   <div className="w-full h-full flex flex-col items-center justify-center gap-3">
                     <div className="w-16 h-16 rounded-full bg-surface-highlight border border-border flex items-center justify-center">
                       <span className="text-xl font-medium text-ink">
-                        {shortPeerId(peerId).slice(0, 2)}
+                        {userName}
                       </span>
                     </div>
                     <span className="text-muted text-sm">Audio only</span>
@@ -428,7 +429,7 @@ function Conference() {
 
                 <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 via-black/30 to-transparent">
                   <span className="text-ink text-xs font-medium">
-                    Guest {shortPeerId(peerId)}
+                     {userName}
                   </span>
                 </div>
               </div>

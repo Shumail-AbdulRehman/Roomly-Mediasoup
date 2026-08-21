@@ -24,9 +24,12 @@ class MediaService {
     if (this.localStream) return this.localStream;
 
     this.localStream = await navigator.mediaDevices.getUserMedia({
-      audio: true,
-      video: true,
-    });
+  audio: true,
+  video: {
+    width: { ideal: 1280 },
+    height: { ideal: 720 },
+  },
+});
 
     return this.localStream;
   }
@@ -59,12 +62,21 @@ class MediaService {
 
       if (videoTrack && !this.videoProducer) {
         this.videoProducer = await transport.produce({
-          track: videoTrack,
-          appData: {
-            type: "camera",
-          },
-        });
+    track: videoTrack,
+    encodings: [
+      { rid: "r0", scaleResolutionDownBy: 4, maxBitrate: 150000 },
+      { rid: "r1", scaleResolutionDownBy: 2, maxBitrate: 500000 },
+      { rid: "r2", scaleResolutionDownBy: 1, maxBitrate: 1500000 },
+    ],
+    codecOptions: {
+      videoGoogleStartBitrate: 300,
+    },
+    appData: {
+      type: "camera",
+    },
+  });
 
+  console.log("encodings:", this.videoProducer.rtpParameters.encodings);
         if (!options.videoEnabled) {
           this.videoProducer.pause();
           videoTrack.enabled = false;

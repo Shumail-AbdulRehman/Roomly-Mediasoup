@@ -93,6 +93,8 @@ async function onCreateConsumer(msg: Msg, peer: Peer) {
       rtpCapabilities,
       paused: true,
     });
+
+    
   } catch (error) {
     const message = {
       type: "error",
@@ -100,10 +102,15 @@ async function onCreateConsumer(msg: Msg, peer: Peer) {
       error: "error while consuming",
     };
 
+    
+
     send(peer.ws, message);
     return;
   }
 
+  consumer.on("layerschange", (layers) => {
+  console.log(`[server] consumer ${consumer.id} switched to`, layers);
+});
   peer.consumers.set(consumer.id, consumer);
 
   room.consumers.set(consumer.id, {
@@ -120,6 +127,7 @@ async function onCreateConsumer(msg: Msg, peer: Peer) {
       rtpParameters: consumer.rtpParameters,
       peerId: roomProducer.peerId,
       appData: roomProducer.producer.appData,
+      userName:peer.userName
     },
   };
 

@@ -308,8 +308,9 @@ export const onConsumerCreated = async (msg: Msg) => {
   const rtpParameters = msg.data.rtpParameters;
   const peerId = msg.data.peerId;
   const appData = msg.data.appData;
+  const userName=msg.data.userName
 
-  if (!consumerId || !producerId || !kind || !rtpParameters || !peerId) {
+  if (!consumerId || !producerId || !kind || !rtpParameters || !peerId || !userName) {
     console.log("Consumer data is incomplete");
     return;
   }
@@ -322,6 +323,7 @@ export const onConsumerCreated = async (msg: Msg) => {
       rtpParameters: rtpParameters,
       appData,
     });
+    
 
     const producerType = consumer.appData?.type;
 
@@ -339,6 +341,7 @@ export const onConsumerCreated = async (msg: Msg) => {
       participant.screenConsumer = consumer;
     }
 
+    participant.userName=userName;
     signalingEvents.emit("remote-stream", participant);
 
     consumers.set(consumer.id, consumer);

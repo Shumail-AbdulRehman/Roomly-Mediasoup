@@ -3,6 +3,7 @@ import WebSocket from "ws";
 
 export interface Peer {
   peerId: string;
+  userName?:string;
   roomId?: string;
   ws: WebSocket;
   transports: Map<string, TransportData>;

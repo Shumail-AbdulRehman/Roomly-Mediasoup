@@ -44,10 +44,10 @@ export const config = {
         {
           // ip: "127.0.0.1",
           ip: "0.0.0.0",
-          announcedIp: "192.168.100.235", // LAN IP for cross-device testing
+          announcedIp: "13.62.50.51", // EC2 public IP
         },
       ] as TransportListenInfo[],
-      maxIncomingBitrate: 1500000,
+      maxIncomingBitrate: 3000000,
       initialAvailableOutgoingBitrate: 1000000,
     },
   },

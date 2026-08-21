@@ -18,7 +18,7 @@ import { rooms } from "../const/const.js";
 
 export const webSocketServer = (wss: WebSocketServer) => {
   wss.on("connection", (ws: WebSocket) => {
-    let peerId: string = crypto.randomUUID();
+    let peerId: string = Math.floor(100000 + Math.random() * 900000).toString();
     const peer: Peer = {
       peerId,
       ws,
@@ -37,9 +37,9 @@ try {
     return;
 }
       if (msg.type === "createRoom") {
-        createRoom(peerId, peer);
+        createRoom(peerId, peer, msg.data.userName);
       } else if (msg.type === "joinRoom") {
-        joinRoom(peerId, msg.data.roomId, peer);
+        joinRoom(peerId, msg.data.roomId, peer, msg.data.userName);
       } else if (msg.type === "getRouterRtpCapabilities") {
         onGetRouterRtpCapabilities(msg, peer);
         console.log("rtp capa");

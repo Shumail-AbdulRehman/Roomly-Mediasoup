@@ -5,13 +5,13 @@ import { createRouterForWorker, getNextWorker } from "./worker.js";
 import send from "../utils/send.js";
 import { rooms } from "../const/const.js";
 
-export const createRoom = async (peerId: string, peer: Peer) => {
+export const createRoom = async (peerId: string, peer: Peer,userName:string) => {
   const worker = getNextWorker();
   const mediasoupRouter = await createRouterForWorker(worker);
-  const roomId = crypto.randomUUID();
-
+const roomId = Math.floor(100000 + Math.random() * 900000).toString();
   console.log("room id is::", roomId);
 
+  peer.userName=userName;
   rooms.set(roomId, {
     roomId,
     worker,
@@ -37,9 +37,18 @@ export const createRoom = async (peerId: string, peer: Peer) => {
 };
 
 
-export const joinRoom = (peerId: string, roomId: string, peer: Peer) => {
+export const joinRoom = (peerId: string, roomId: string, peer: Peer,userName:string) => {
   const room = rooms.get(roomId);
 
+  if(!userName) {
+    peer.userName = `Guest-${Math.floor(1000 + Math.random() * 9000)}`; 
+   } else {
+    peer.userName=userName;
+  }
+
+
+
+  
   if (!room) {
     console.error("room not found");
     const message = {

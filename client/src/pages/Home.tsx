@@ -12,6 +12,7 @@ function Home() {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
+  const [userName,setUserName]=useState("");
   const [roomId, setRoomId] = useState("");
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [loading, setLoading] = useState(false);
@@ -139,10 +140,13 @@ function Home() {
     if (isJoiningRef.current || loading) return;
 
     const trimmed = roomId.trim();
-    if (!trimmed) {
-      setError("Please enter a room ID");
+    const usernameTrimmed=userName.trim();
+
+    if (!trimmed  ||  !usernameTrimmed) {
+      setError("Please enter a room ID and name.");
       return;
     }
+
 
     setError(null);
     setLoading(true);
@@ -153,7 +157,7 @@ function Home() {
       if (!mountedRef.current) return;
       send(ws, {
         type: "joinRoom",
-        data: { roomId: trimmed },
+        data: { roomId: trimmed , userName:usernameTrimmed},
       });
     } catch {
       if (!mountedRef.current) return;
@@ -166,6 +170,13 @@ function Home() {
   const handleCreateRoom = async () => {
     if (isJoiningRef.current || loading) return;
 
+        const usernameTrimmed=userName.trim();
+
+
+        if(!usernameTrimmed) {
+          setError("enter your name");
+          return;
+        }
     setError(null);
     setLoading(true);
     isJoiningRef.current = true;
@@ -173,7 +184,7 @@ function Home() {
     try {
       const ws = await connectWebSocket();
       if (!mountedRef.current) return;
-      send(ws, { type: "createRoom" });
+      send(ws, { type: "createRoom",data:{userName:usernameTrimmed} });
     } catch {
       if (!mountedRef.current) return;
       setLoading(false);
@@ -217,10 +228,24 @@ function Home() {
         {/* Form */}
         <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto lg:mx-0 w-full">
           {error && (
-            <div role="alert" className="mb-4 px-4 py-3 rounded-xl bg-tally-red/10 border border-tally-red/20 text-tally-red text-sm">
+            <div role="alert" className="mb-4 px-4 py-3 rounded-sm bg-tally-red/10 border border-tally-red/20 text-red-600 text-lg">
               {error}
             </div>
           )}
+
+           <label htmlFor="roomId" className="sr-only">
+            Name
+          </label>
+          <input
+            id="name"
+            type="text"
+            placeholder="Enter your name"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+            disabled={loading}
+            className="w-full px-4 py-3 rounded-xl bg-surface border border-border text-ink placeholder-muted outline-none focus:border-waveform-green/40 focus:bg-surface-highlight transition-all text-sm disabled:opacity-60 disabled:cursor-not-allowed"
+          />
+
 
           <label htmlFor="roomId" className="sr-only">
             Room ID
