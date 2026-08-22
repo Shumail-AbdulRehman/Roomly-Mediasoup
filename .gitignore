@@ -17,3 +17,5 @@ skills-lock.json
 client/certs/
 server/certs/
 mkcert
+
+.docs/
