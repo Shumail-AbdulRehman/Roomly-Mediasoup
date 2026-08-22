@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { mediaService } from "../services/mediaService";
 import { signalingEvents } from "../services/signalingEvents";
@@ -8,6 +8,59 @@ import {
   setCurrentRoomId,
   setIntentionalClose,
 } from "../lib/websocket";
+
+function RemoteVideo({
+  stream,
+  className,
+}: {
+  stream: MediaStream;
+  className?: string;
+}) {
+  const videoRef = useCallback(
+    (element: HTMLVideoElement | null) => {
+      if (element && element.srcObject !== stream) {
+        element.srcObject = stream;
+      }
+    },
+    [stream],
+  );
+
+  return (
+    <video ref={videoRef} autoPlay playsInline className={className} />
+  );
+}
+
+function ScreenShareVideo({
+  stream,
+  peerId,
+  onRef,
+  onDoubleClick,
+}: {
+  stream: MediaStream;
+  peerId: string;
+  onRef: (peerId: string, element: HTMLVideoElement | null) => void;
+  onDoubleClick: (peerId: string) => void;
+}) {
+  const videoRef = useCallback(
+    (element: HTMLVideoElement | null) => {
+      if (element && element.srcObject !== stream) {
+        element.srcObject = stream;
+      }
+      onRef(peerId, element);
+    },
+    [stream, peerId, onRef],
+  );
+
+  return (
+    <video
+      ref={videoRef}
+      autoPlay
+      playsInline
+      className="w-full h-full object-contain bg-black cursor-pointer"
+      onDoubleClick={() => onDoubleClick(peerId)}
+    />
+  );
+}
 
 function Conference() {
   const location = useLocation();
@@ -227,38 +280,70 @@ function Conference() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const enterFullscreen = (peerId: string) => {
+  const enterFullscreen = useCallback((peerId: string) => {
     const video = screenVideoRefs.current.get(peerId);
     if (video?.requestFullscreen) {
       video.requestFullscreen().catch((err) => {
         console.error("Fullscreen failed:", err);
       });
     }
-  };
+  }, []);
 
-  const videoAudioStreams = remoteParticipants.map((p) => {
-    const stream = new MediaStream();
-    
+  const handleScreenVideoRef = useCallback(
+    (peerId: string, element: HTMLVideoElement | null) => {
+      if (element) {
+        screenVideoRefs.current.set(peerId, element);
+      } else {
+        screenVideoRefs.current.delete(peerId);
+      }
+    },
+    [],
+  );
 
-    if (p.cameraConsumer?.track) {
-      stream.addTrack(p.cameraConsumer.track);
+  const streamCache = useRef(new Map<string, MediaStream>());
+
+const videoAudioStreams = remoteParticipants.map((p) => {
+  let stream = streamCache.current.get(p.peerId);
+  if (!stream) {
+    stream = new MediaStream();
+    streamCache.current.set(p.peerId, stream);
+  }
+
+  const wantTracks = [p.cameraConsumer?.track, p.audioConsumer?.track].filter(Boolean) as MediaStreamTrack[];
+  const currentTracks = stream.getTracks();
+
+  const changed =
+    wantTracks.length !== currentTracks.length ||
+    wantTracks.some((t) => !currentTracks.includes(t));
+
+  if (changed) {
+    currentTracks.forEach((t) => stream!.removeTrack(t));
+    wantTracks.forEach((t) => stream!.addTrack(t));
+  }
+
+  return { peerId: p.peerId, stream, userName: p.userName, hasVideo: !!p.cameraConsumer?.track };
+});
+
+  const screenStreamCache = useRef(new Map<string, MediaStream>());
+
+const screenStreams = remoteParticipants
+  .filter((p) => p.screenConsumer?.track)
+  .map((p) => {
+    const track = p.screenConsumer!.track;
+    let stream = screenStreamCache.current.get(p.peerId);
+
+    if (!stream || !stream.getTracks().includes(track)) {
+      stream = new MediaStream([track]);
+      screenStreamCache.current.set(p.peerId, stream);
     }
 
-    if (p.audioConsumer?.track) {
-      stream.addTrack(p.audioConsumer.track);
-    }
-
-    return { peerId: p.peerId, stream,userName:p.userName, hasVideo: !!p.cameraConsumer?.track };
-  });
-
-  const screenStreams = remoteParticipants
-    .filter((p) => p.screenConsumer?.track)
-    .map((p) => ({
+    return {
       peerId: `${p.peerId}-screen`,
       ownerPeerId: p.peerId,
-      stream: new MediaStream([p.screenConsumer!.track]),
-      userName:p.userName
-    }));
+      stream,
+      userName: p.userName,
+    };
+  });
 
   const gridClass =
     videoAudioStreams.length <= 1
@@ -323,19 +408,11 @@ function Conference() {
                   key={peerId}
                   className="relative flex-1 rounded-2xl overflow-hidden bg-surface border border-waveform-green/20 shadow-lg shadow-black/20 group"
                 >
-                  <video
-                    autoPlay
-                    playsInline
-                    ref={(element) => {
-                      if (element) {
-                        element.srcObject = stream;
-                        screenVideoRefs.current.set(peerId, element);
-                      } else {
-                        screenVideoRefs.current.delete(peerId);
-                      }
-                    }}
-                    className="w-full h-full object-contain bg-black cursor-pointer"
-                    onDoubleClick={() => enterFullscreen(peerId)}
+                  <ScreenShareVideo
+                    stream={stream}
+                    peerId={peerId}
+                    onRef={handleScreenVideoRef}
+                    onDoubleClick={enterFullscreen}
                   />
                   <div className="absolute top-3 left-3 px-2.5 py-1 ">
                     <span className=" bg-black text-[13px] font-medium  tracking-wider">
@@ -366,14 +443,8 @@ function Conference() {
                   }`}
                 >
                   {hasVideo ? (
-                    <video
-                      autoPlay
-                      playsInline
-                      ref={(element) => {
-                        if (element) {
-                          element.srcObject = stream;
-                        }
-                      }}
+                    <RemoteVideo
+                      stream={stream}
                       className="w-full h-full object-cover"
                     />
                   ) : (
@@ -406,14 +477,8 @@ function Conference() {
                 }`}
               >
                 {hasVideo ? (
-                  <video
-                    autoPlay
-                    playsInline
-                    ref={(element) => {
-                      if (element) {
-                        element.srcObject = stream;
-                      }
-                    }}
+                  <RemoteVideo
+                    stream={stream}
                     className="w-full h-full object-cover"
                   />
                 ) : (

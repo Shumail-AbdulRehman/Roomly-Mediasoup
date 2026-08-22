@@ -44,7 +44,8 @@ export const config = {
         {
           // ip: "127.0.0.1",
           ip: "0.0.0.0",
-          announcedIp: "13.62.50.51", // EC2 public IP
+          announcedIp:"127.0.0.1"
+          // announcedIp: "13.62.50.51", // EC2 public IP
         },
       ] as TransportListenInfo[],
       maxIncomingBitrate: 3000000,
