@@ -19,3 +19,6 @@ server/certs/
 mkcert
 
 .docs/
+
+# Documentation directory
+docs/
